@@ -1,0 +1,123 @@
+---
+title: "QMM Assignment"
+author: "Bhargav"
+date: "2023-09-19"
+output:
+  html_document: default
+  word_document: default
+  pdf_document: default
+---
+#Defining the Decision variables:
+##Decision variables for 3 plants
+  A1= Quantity of products produced by Plant1 of size large
+  B1= Quantity of products produced by Plant1 of size medium
+  C1= Quantity of products produced by Plant1 of size small
+  A2= Quantity of products produced by Plant2 of size large
+  B2= Quantity of products produced by Plant2 of size medium
+  C2= Quantity of products produced by Plant2 of size small
+  A3= Quantity of products produced by Plant3 of size large
+  B3= Quantity of products produced by Plant3 of size medium
+  C3= Quantity of products produced by Plant3 of size small
+
+
+#further we need to specify objective function, constraints, direction, right hand side(constants) to solve the problem.
+
+##Objective Function:
+  The objective function to maximize the profit. So,
+  max z= 420*(A1+A2+A3) +360*(B1+B2+B3) +300*(C1+C2+C3)
+  That can be written as,
+  max z= 420A1 +360B1 +300C1 +420A2 +360B2 +300C2 +420A3 +360B3 +300C3
+
+##Constraints:
+  A1 +B1 +C1 <=750
+  A2 +B2 +C2 <=900
+  A3 +B3 +C3 <=450
+  20A1 +15B1 +12C1 <= 13000
+  20A2 +15B2 +12C2 <= 12000
+  20A3 +15B3 +12C3 <= 5000
+  A1 +A2 +A3 <= 900
+  B1 +B2 +B3 <= 1200
+  C1 +C2 +C3 <= 750
+  (A1 +B1 +C1)/ 750 = (A2 +B2 +C2)/ 900 = (A3 +B3 +C3)/ 450
+  
+Non Negativity Constraints,
+  A1, A2, A3, B1, B2, B3, C1, C2, C3 >= 0
+
+The above constraints can be written as,
+  A1 +B1 +C1 +0*A2 +0*B2 +0*C2 +0*A3 +0*B3 +0*C3 <=750
+  0*A1 +0*B1 +0*C1 +A2 +B2 +C2 +0*A3 +0*B3 +0*C3 <=900
+  0*A1 +0*B1 +0*C1 +0*A2 +0*B2 +0*C2 +A3 +B3 +C3 <=450
+  20A1 +15B1 +12C1 +0*A2 +0*B2 +0*C2 +0*A3 +0*B3 +0*C3 <= 13000
+  0*A1 +0*B1 +0*C1 +20A2 +15B2 +12C2 +0*A3 +0*B3 +0*C3 <= 12000
+  0*A1 +0*B1 +0*C1 +0*A2 +0*B2 +0*C2 +20A3 +15B3 +12C3 <= 5000
+  A1 +0*B1 +0*C1 +A2 +0*B2 +0*C2 +A3 +0*B3 +0*C3 <= 900
+  0*A1 +B1 +0*C1 +0*A2 +B2 +0*C2 +0*A3 +B3 +0*C3 <= 1200
+  0*A1 +0*B1 +C1 +0*A2 +0*B2 +C2 +0*A3 +0*B3 +C3 <= 750
+  900*A1 +900*B1 +900*C1 -750*A2 -750*B2 -750*C2 +0*A3 +0*B3 +0*C3 =0
+  0*A1 +0*B1 +0*C1 +450*A2 +450*B2 +450*C2 -900*A3 -900*B3 -900*C3 =0
+  450*A1 +450*B1 +450*C1 +0*A2 +0*B2 +0*C2 -900*A3 -900*B3 -900*C3 =0
+
+
+#Calling the 'lpSolve' library and declaring the objective function as 'f.obj'
+```{r}
+#library
+library(lpSolve)
+#objective function
+f.obj <- c(420,360,300,420,360,300,420,360,300)
+
+```
+
+#Declaring the constraints as 'f.con'
+```{r}
+f.con <- matrix(c( 1,1,1,0,0,0,0,0,0,
+                   0,0,0,1,1,1,0,0,0,
+                   0,0,0,0,0,0,1,1,1,
+                   20,15,12,0,0,0,0,0,0,
+                   0,0,0,20,15,12,0,0,0,
+                   0,0,0,0,0,0,20,15,12,
+                   1,0,0,1,0,0,1,0,0,
+                   0,1,0,0,1,0,0,1,0,
+                   0,0,1,0,0,1,0,0,1,
+                   900,900,900,-750,-750,-750 ,0, 0, 0,
+                   0,0,0,450,450,450,-900,-900,-900,
+                   450,450,450,0,0,0,-750,-750,-750),ncol = 9, byrow=TRUE)
+```
+#Declaring the directions as 'f.dir'
+```{r}
+f.dir <- c("<=",
+           "<=",
+           "<=",
+           "<=",
+           "<=",
+           "<=",
+           "<=",
+           "<=",
+           "<=",
+           "=",
+           "=",
+           "=")
+
+```
+#Declaring the Right hand side constants as 'f.rhs'
+```{r}
+f.rhs <- c(750,900,450,13000,12000,5000,900,1200,750,0,0,0)
+```
+#Calling the LP function to Solve the problem based on objective function to maximize the profit
+```{r}
+f.max <- lp("max",f.obj,f.con,f.dir,f.rhs)
+f.max
+```
+#Calling the LP function to get the values for Variables defined above
+```{r}
+f.max$solution
+```
+#Calling the LP function to Solve the problem based on objective function to maximize the profit using 'int.vec'
+```{r}
+f.max2 <- lp("max",f.obj,f.con,f.dir,f.rhs,int.vec=1:9) #int.vec to get exact values of variables
+f.max2
+```
+#Calling the LP function to get the values for Variables defined above, with int.vec
+```{r}
+f.max2$solution
+```
+

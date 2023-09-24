@@ -108,7 +108,7 @@ f.max$solution
 ```
 ```{r}
 #Calling the LP function to Solve the problem based on objective function to maximize the profit using 'int.vec'
-f.max2 <- lp("max", f.obj, f.con, f.dir, f.rhs, int.vec=1:9) #int.vec to get exact values                                                                of variables
+f.max2 <- lp("max", f.obj, f.con, f.dir, f.rhs, int.vec=1:9) #int.vec to get exact values of variables
 f.max2
 
 #Calling the LP function to get the values for Variables defined above, with int.vec
